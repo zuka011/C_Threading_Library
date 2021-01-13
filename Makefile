@@ -1,3 +1,6 @@
+CC = gcc
+CFLAGS = -lpthread -g -Wall 
+
 QUEUE_SRC = Queue.c
 QUEUE_DPS = $(QUEUE_SRC) Queue.h 
 
@@ -11,16 +14,16 @@ FUTURE_SRC = $(CHANNEL_SRC) Future.c
 FUTURE_DEPS = $(CHANNEL_DEPS) Future.c Future.h
 
 QueueTest: $(QUEUE_DEPS) QueueTest.c
-	gcc -g -Wall -o QueueTest $(QUEUE_SRC) QueueTest.c -lpthread
+	$(CC) -o $@ $(QUEUE_SRC) $@.c $(CFLAGS)
 
 ThreadPoolTest: $(THREAD_POOL_DEPS)  ThreadPoolTest.c
-	gcc -g -Wall -o ThreadPoolTest $(THREAD_POOL_SRC) ThreadPoolTest.c -lpthread
+	$(CC) -o $@ $(THREAD_POOL_SRC) $@.c $(CFLAGS)
 
 ChannelTest: $(CHANNEL_DEPS) ChannelTest.c 
-	gcc -g -Wall -o ChannelTest $(CHANNEL_SRC) ChannelTest.c -lpthread
+	$(CC) -o $@ $(CHANNEL_SRC) $@.c $(CFLAGS)
 
 FutureTest: $(FUTURE_DEPS) FutureTest.c
-	gcc -g -Wall -o FutureTest $(FUTURE_SRC) FutureTest.c -lpthread
+	$(CC) -o $@ $(FUTURE_SRC) $@.c $(CFLAGS)
 
 clean:
 	rm *Test
