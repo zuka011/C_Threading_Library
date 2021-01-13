@@ -41,10 +41,9 @@ static void *Manager(void *futurePtr) {
 	pthread_join(future->executorID, &result);
 
 	if(future->state != DONE && result != PTHREAD_CANCELED) perror("Failed to cancel Future execution.\n"); 
-	if(future->state != DONE) future->state == CANCELED;
+	if(future->state != DONE) future->state = CANCELED;
 
 	sem_post(&future->timerSet);
-
 	pthread_join(future->timerID, NULL);
 
 	return NULL;
@@ -57,7 +56,7 @@ static void *Timer(void *futurePtr) {
 	while(1) {
 
 		sem_wait(&future->timerSet);
-		if(future->state == DONE && future->state == CANCELED) break;
+		if(future->state == DONE || future->state == CANCELED) break;
 
 		sleep(future->timeout);
 
@@ -107,12 +106,14 @@ int FutureGet(Future *future, void **buffer, unsigned long timeout) {
 
 int FutureCancel(Future *future) {
 
-	if(future->state == DONE || future->state == CANCELED) return EXIT_FAILURE;
+	int err;
+	if(future->state == DONE || future->state == CANCELED) err = EXIT_FAILURE;
+	else err = EXIT_SUCCESS;
 
 	future->requestType = CANCEL;
 	sem_post(&future->requested);
 
-	return EXIT_SUCCESS;
+	return err;
 }
 
 //----------------------------------------------------------//
@@ -131,8 +132,8 @@ int FutureIsCancelled(Future *future) {
 
 void FutureDispose(Future *future) {
 
-	if(future->state != DONE && future->state != CANCELED) FutureCancel(future);
-	
+	FutureCancel(future);
+
 	pthread_join(future->managerID, NULL);
 	
 	sem_destroy(&future->requested);

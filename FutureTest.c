@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include "ThreadPool.h"
 #include "Channel.h"
+#include "Future.h"
 
 #define min(a, b) (a < b ? a : b)
 
@@ -96,14 +97,27 @@ void getAverage(void *dataPtr) {
 	free(sum);
 }
 
-void displayAverage(void *channelPtr) {
+void *displayAverage(void *channelPtr) {
 
 	Channel *channel = (Channel *) channelPtr;
 
 	double *average = (double *) ChannelGet(channel);
 	printf("Average of %d items is: %f.\n", N_ITEMS, *average);
 
-	free(average);
+	sleep(3);
+
+	printf("Now returning average...\n");
+
+	return average;
+}
+
+void *cancelRoutine(void *delayPtr) {
+
+	printf("This should be printed.\n");
+	sleep(*(int *) delayPtr);
+	printf("This shouldn't");
+
+	return NULL;
 }
 
 int main() {
@@ -133,11 +147,42 @@ int main() {
 
 	ThreadPoolSchedule(&pool, getAverage, &data);
 
-	ThreadPoolSchedule(&pool, displayAverage, &data.finalAverageChannel);
-
 	ThreadPoolShutdown(&pool);
 
 	printf("Thread pool has shut down.\n");
+
+	Future average;
+	void *averagePtr;
+	
+	FutureInit(&average, displayAverage, &data.finalAverageChannel);
+
+	while(!FutureIsDone(&average)) {
+
+		if(FutureGet(&average, &averagePtr, 1)) printf("Future says computation ain't ready.\n");
+		else {
+			
+			printf("Future says average is: %f.\n", *(double *)averagePtr);
+			free(averagePtr);
+		}
+	}
+
+	FutureDispose(&average);
+
+	Future cancelTest;
+	int executionTime = 10;
+
+	FutureInit(&cancelTest, cancelRoutine, &executionTime);
+	
+	sleep(executionTime/2);
+
+	if(!FutureIsDone(&cancelTest)) FutureCancel(&cancelTest);
+
+	sleep(1);
+
+	if(FutureIsCancelled(&cancelTest)) printf("Future is canceled.\n");
+	else printf("Future is not canceled.\n");
+
+	FutureDispose(&cancelTest);
 
 	return 0;
 }
