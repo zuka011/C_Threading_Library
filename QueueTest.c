@@ -135,7 +135,7 @@ void randomSleep(int from, int to) {
 
 void *testThread(void *args) {
 
-	randomSleep(0, 2);
+	randomSleep(0, 1);
 
 	Queue *testQueue = ((ThreadArgs *) args)->testQueue;
 	int id = ((ThreadArgs *) args)->threadID;

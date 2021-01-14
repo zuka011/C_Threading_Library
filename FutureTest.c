@@ -169,7 +169,7 @@ int main() {
 	FutureDispose(&average);
 
 	Future cancelTest;
-	int executionTime = 10;
+	int executionTime = 2;
 
 	FutureInit(&cancelTest, cancelRoutine, &executionTime);
 	
