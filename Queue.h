@@ -39,6 +39,8 @@ typedef struct {
 } Queue;
 
 /**
+ * 		Method: QueueInit();
+ * //----------------------------------------------------------//
  * Constructor for the queue. 
  * 
  * Parameters:
@@ -49,34 +51,46 @@ typedef struct {
 void QueueInit(Queue *queue, int elemSize, FreeFn freeFn, int threadSafe);
 
 /**
+ * 		Method: QueueEnqueue();
+ * //----------------------------------------------------------//
  * Enqueues the element at address [elemAddr] to the queue. The element is copied to a new
  * location in the heap.
  */
 void QueueEnqueue(Queue *queue, void *elemAddr);
 
 /**
+ * 		Method: QueueDequeue();
+ * //----------------------------------------------------------//
  * Dequeues an element from the queue. A pointer to the element is returned. 
  * It is the user's responsibility to free the memory occupied by this element.
  */
 void *QueueDequeue(Queue *queue);
 
 /**
+ * 		Method: QueuePeek();
+ * //----------------------------------------------------------//
  * Returns a pointer to the first element in the queue. The element still belongs 
  * to the queue so it should not be freed.
  */
 void *QueuePeek(Queue *queue);
 
 /**
+ * 		Method: QueueSize();
+ * //----------------------------------------------------------//
  * Returns the number of elements in the queue. 
  */
 int QueueSize(Queue *queue);
 
 /**
+ * 		Method: QueueIsEmpty();
+ * //----------------------------------------------------------//
  * Returns a non-zero value if queue is empty, 0 otherwise.
  */
 int	QueueIsEmpty(Queue *queue);
 
 /**
+ * 		Method: QueueDispose();
+ * //----------------------------------------------------------//
  * Destructor for the queue.
  * This (like the constructor) should only be called once (even if you're using
  * multiple threads).
