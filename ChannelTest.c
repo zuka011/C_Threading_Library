@@ -116,7 +116,7 @@ int main() {
 	Data data;
 	fillData(&data);
 
-	ChannelInit(&data.groupNumberChannel, sizeof(int), NULL, 0);
+	ChannelInit(&data.groupNumberChannel, sizeof(int), NULL, 5);
 	ChannelInit(&data.partialSumChannel, sizeof(unsigned long), NULL, 0);
 	ChannelInit(&data.finalSumChannel, sizeof(unsigned long), NULL, 0);
 	ChannelInit(&data.finalAverageChannel, sizeof(double), NULL, 0);
@@ -138,6 +138,20 @@ int main() {
 	ThreadPoolShutdown(&pool);
 
 	printf("Thread pool has shut down.\n");
+
+	//Testing ChannelResize() method:
+	Channel testChannel;
+
+	ChannelInit(&testChannel, sizeof(int), NULL, 5);
+	for(int i = 0; i < 5; i++) ChannelSend(&testChannel, &i);
+
+	ChannelResize(&testChannel, 1);
+
+	int *lastElemPtr = (int *) ChannelGet(&testChannel);
+	printf("Last elem was %d.\n", *lastElemPtr);
+
+	if(ChannelLength(&testChannel) > 0) printf("Ooops, the channel still isn't empty.\n");
+	free(lastElemPtr);
 
 	return 0;
 }
