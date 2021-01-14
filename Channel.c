@@ -5,6 +5,10 @@
 
 void ChannelInit(Channel *channel, int elemSize, FreeFn freeFn, int maxCapacity) {
 	
+	assert(channel != NULL);
+	assert(elemSize > 0);
+	assert(maxCapacity >= 0);
+
 	QueueInit(&channel->itemQueue, elemSize, freeFn, 0);
 
 	channel->maxCapacity = maxCapacity;
@@ -20,6 +24,9 @@ void ChannelInit(Channel *channel, int elemSize, FreeFn freeFn, int maxCapacity)
 
 void ChannelSend(Channel *channel, void *elemAddr) {
 
+	assert(channel != NULL);
+	assert(elemAddr != NULL);
+
 	pthread_mutex_lock(&channel->itemLock);
 	while(channel->maxCapacity > 0 && QueueSize(&channel->itemQueue) >= channel->maxCapacity) {
 		pthread_cond_wait(&channel->sendCond, &channel->itemLock);
@@ -34,6 +41,8 @@ void ChannelSend(Channel *channel, void *elemAddr) {
 //----------------------------------------------------------//
 
 void *ChannelGet(Channel *channel) {
+
+	assert(channel != NULL);
 
 	pthread_mutex_lock(&channel->itemLock);
 	while(QueueIsEmpty(&channel->itemQueue)) {
@@ -51,6 +60,9 @@ void *ChannelGet(Channel *channel) {
 //----------------------------------------------------------//
 
 int	ChannelLength(Channel *channel) {
+
+	assert(channel != NULL);
+
 	return QueueSize(&channel->itemQueue);
 }
 
@@ -58,12 +70,15 @@ int	ChannelLength(Channel *channel) {
 
 void ChannelResize(Channel *channel, int newCapacity) {
 
+	assert(channel != NULL);
+	assert(newCapacity >= 0);
+
 	pthread_mutex_lock(&channel->itemLock);
 	while(QueueSize(&channel->itemQueue) > newCapacity) {
 
 		void *elemAddr = QueueDequeue(&channel->itemQueue);
 		
-		channel->freeFn(elemAddr);
+		if(channel->freeFn != NULL) channel->freeFn(elemAddr);
 		free(elemAddr);
 	}
 
@@ -75,6 +90,8 @@ void ChannelResize(Channel *channel, int newCapacity) {
 //----------------------------------------------------------//
 
 void ChannelDispose(Channel *channel) {
+
+	assert(channel != NULL);
 	
 	QueueDispose(&channel->itemQueue);
 

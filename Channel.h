@@ -79,7 +79,7 @@ int	ChannelLength(Channel *channel);
  * 	Sets the maximum capacity of the channel to [newCapacity].
  * 
  * If the new capacity is less than the current length of the channel, all
- * extra items are discarded.
+ * extra items are discarded. Oldest items are discarded first.
  */
 void ChannelResize(Channel *channel, int newCapacity);
 
