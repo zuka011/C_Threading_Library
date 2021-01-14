@@ -13,15 +13,15 @@ TOTAL_TESTS=0
 
 echo "Performing Memory Test on:" $TESTS
 
-echo "Memory check results:\n" > memLog.txt
-echo "Test outputs:\n" > output.txt
+printf "Memory check results:\n\n" > memLog.txt
+printf "Test outputs:\n\n" > output.txt
 for test in $TESTS;
     do echo "Testing:" $test;
 
     echo > temp.txt
   
-    echo "Testing:" $test"\n" >> memLog.txt
-    echo "Testing:" $test"\n" >> output.txt  
+    printf "Testing: $test\n" >> memLog.txt
+    printf "Testing: $test\n" >> output.txt  
     valgrind --tool=memcheck --log-file="temp.txt" ./$test >> output.txt
 
     cat temp.txt >> memLog.txt
@@ -37,6 +37,9 @@ for test in $TESTS;
     fi
 
     ((TOTAL_TESTS=TOTAL_TESTS+1))
+
+    printf "\n" >> memLog.txt
+    printf "\n" >> output.txt
 
 done
 
