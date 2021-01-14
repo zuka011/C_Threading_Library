@@ -25,5 +25,8 @@ ChannelTest: $(CHANNEL_DEPS) ChannelTest.c
 FutureTest: $(FUTURE_DEPS) FutureTest.c
 	$(CC) -o $@ $(FUTURE_SRC) $@.c $(CFLAGS)
 
+All: QueueTest ThreadPoolTest ChannelTest FutureTest
+
 clean:
 	rm *Test
+	rm *.txt
