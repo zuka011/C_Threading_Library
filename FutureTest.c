@@ -151,6 +151,7 @@ int main() {
 
 	printf("Thread pool has shut down.\n");
 
+	// Testing FutureGet() with timeout
 	Future average;
 	void *averagePtr;
 	
@@ -168,6 +169,7 @@ int main() {
 
 	FutureDispose(&average);
 
+	// Testing FutureCancel()
 	Future cancelTest;
 	int executionTime = 2;
 
