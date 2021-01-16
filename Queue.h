@@ -61,10 +61,10 @@ void QueueEnqueue(Queue *queue, void *elemAddr);
 /**
  * 		Method: QueueDequeue();
  * //----------------------------------------------------------//
- * Dequeues an element from the queue. A pointer to the element is returned. 
- * It is the user's responsibility to free the memory occupied by this element.
+ * Dequeues an element from the queue. The element is copied into the location pointed to
+ * by [buffer].
  */
-void *QueueDequeue(Queue *queue);
+void QueueDequeue(Queue *queue, void *buffer);
 
 /**
  * 		Method: QueuePeek();

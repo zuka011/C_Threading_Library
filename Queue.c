@@ -68,9 +68,10 @@ void QueueEnqueue(Queue *queue, void *elemAddr) {
 
 //----------------------------------------------------------//
 
-void *QueueDequeue(Queue *queue){
+void QueueDequeue(Queue *queue, void *buffer){
 
 	assert(queue != NULL);
+	assert(buffer != NULL);
 
 	QueueWait(queue);
 
@@ -83,9 +84,10 @@ void *QueueDequeue(Queue *queue){
 	queue->nElems--;
 
 	if(queue->threadSafe) pthread_mutex_unlock(&queue->QueueLock);
-	free(currNode);
 
-	return valueAddr;
+	memcpy(buffer, valueAddr, queue->elemSize);
+	free(currNode);
+	free(valueAddr);
 }
 
 //----------------------------------------------------------//
@@ -96,7 +98,7 @@ void *QueuePeek(Queue *queue) {
 
 	QueueWait(queue);
 
-	return queue->tail;
+	return queue->tail->valueAddr;
 }
 
 //----------------------------------------------------------//

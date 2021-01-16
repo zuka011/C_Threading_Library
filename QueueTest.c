@@ -30,16 +30,15 @@ void intTest() {
 
 	for(int i = 0; i < 90; i++) {
 
-		int *dequeuedInt = (int *) QueueDequeue(&queue);
-		if(i != *dequeuedInt) {
+		int dequeuedInt;
+		QueueDequeue(&queue, &dequeuedInt);
+
+		if(i != dequeuedInt) {
 
 			testSuccess = 0;
 			printf("Fail at i = %d\n", i);	
-			free(dequeuedInt);
 			break;
 		}
-
-		free(dequeuedInt);
 	}
 
 	QueueDispose(&queue);
@@ -68,16 +67,15 @@ void structTest() {
 
 	for(int i = 0; i < 90; i++) {
 
-		TestStruct *dequeuedStruct = (TestStruct *) QueueDequeue(&queue);
-		if(i*i != dequeuedStruct->someFieldOne || i << (i % 30) != dequeuedStruct->someFieldTwo) {
+		TestStruct dequeuedStruct;
+		QueueDequeue(&queue, &dequeuedStruct);
+
+		if(i*i != dequeuedStruct.someFieldOne || i << (i % 30) != dequeuedStruct.someFieldTwo) {
 
 			testSuccess = 0;
 			printf("Fail at i = %d\n", i);	
-			free(dequeuedStruct);
 			break;
 		}
-
-		free(dequeuedStruct);
 	}
 
 	QueueDispose(&queue);
@@ -108,18 +106,18 @@ void stringTest() {
 		for(int j = 0; j < 9; j++) string[j] = i + j;
 		string[9] = '\0';
 
-		char **dequeuedStringAddr = (char **) QueueDequeue(&queue);
-		if(strcmp(string, *dequeuedStringAddr)) {
+		char *dequeuedStringAddr;
+		QueueDequeue(&queue, &dequeuedStringAddr);
+		
+		if(strcmp(string, dequeuedStringAddr)) {
 
 			testSuccess = 0;
 			printf("Fail at i = %d\n", i);	
-			stringFree(dequeuedStringAddr);
-			free(dequeuedStringAddr);
+			stringFree(&dequeuedStringAddr);
 			break;
 		}
 
-		stringFree(dequeuedStringAddr);
-		free(dequeuedStringAddr);
+		stringFree(&dequeuedStringAddr);
 	}
 
 	QueueDispose(&queue);
@@ -151,12 +149,11 @@ void *testThread(void *args) {
 
 	for(int i = 0; i < nItems; i++) {
 	
-		int *currItemAddr =  (int *) QueueDequeue(testQueue);
+		int currItemAddr; 
+		QueueDequeue(testQueue, &currItemAddr);
 
-		printf("Thread #%d dequeued %d.\n", id, *currItemAddr);
+		printf("Thread #%d dequeued %d.\n", id, currItemAddr);
 		randomSleep(0, 1);
-
-		free(currItemAddr);
 	}
 
 	return NULL;
