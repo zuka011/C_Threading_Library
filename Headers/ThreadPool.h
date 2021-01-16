@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include <assert.h>
 
-#include "Queue.h"
+#include "../Headers/Queue.h"
 
 /**
  * This is the interface for a thread pool structure.

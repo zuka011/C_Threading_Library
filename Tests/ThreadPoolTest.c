@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "ThreadPool.h"
+#include "../Headers/ThreadPool.h"
 #include "pthread.h"
 
 #define min(a, b) (a < b ? a : b)

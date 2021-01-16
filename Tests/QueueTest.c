@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "Queue.h"
 #include "pthread.h"
+
+#include "../Headers/Queue.h"
 
 #define N_TEST_THREADS 10
 #define MIN_ITEMS 1
@@ -17,6 +18,7 @@ typedef struct {
 } ThreadArgs;
 
 int testSuccess = 1;
+int verboseOutput = 0;
 
 void intTest() {
 
@@ -139,7 +141,7 @@ void *testThread(void *args) {
 	int id = ((ThreadArgs *) args)->threadID;
 
 	int nItems = randomInt(MIN_ITEMS, MAX_ITEMS);
-	printf("Thread #%d enqueueing %d items.\n", id, nItems);
+	if(verboseOutput) printf("Thread #%d enqueueing %d items.\n", id, nItems);
 
 	for(int i = 0; i < nItems; i++) {
 	
@@ -152,7 +154,7 @@ void *testThread(void *args) {
 		int currItemAddr; 
 		QueueDequeue(testQueue, &currItemAddr);
 
-		printf("Thread #%d dequeued %d.\n", id, currItemAddr);
+		if(verboseOutput) printf("Thread #%d dequeued %d.\n", id, currItemAddr);
 		randomSleep(0, 1);
 	}
 
@@ -188,7 +190,28 @@ void testThreads() {
 	QueueDispose(&testQueue);
 }
 
-int main() {
+int checkCommandLineArgs(int nArgs, char *args[]) {
+
+	if(nArgs > 2) {
+
+		printf("Too many command line arguments. You can request verbose output by adding -v.\n");
+		return 1;
+	}
+
+	if(nArgs == 2) {
+
+		if(strcmp(args[1], "-v") == 0) verboseOutput = 1;
+		else {
+			printf("Not a valid argument. You can request verbose output by adding -v.\n");
+			return 1;
+		} 
+	}
+	return 0;
+}
+
+int main(int nArgs, char *args[]) {
+
+	if(checkCommandLineArgs(nArgs, args)) return 1;
 
 	intTest();
 	structTest();

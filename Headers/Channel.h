@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "Queue.h"
+#include "../Headers/Queue.h"
 
 /**
  * 	This is the interface of a generic undirected channel structure.
@@ -23,6 +23,7 @@ typedef void (*FreeFn)(void *);
 typedef struct {
 
 	Queue itemQueue;
+	int elemSize;
 	int maxCapacity;
 
 	pthread_mutex_t itemLock;
@@ -53,7 +54,7 @@ void ChannelInit(Channel *channel, int elemSize, FreeFn freeFn, int maxCapacity)
  * a channel is reached and a thread is attempting to send something through, it 
  * will get blocked until another thread reads a previously sent item.
  */
-void ChannelSend(Channel *channel, void *elemAddr);
+void ChannelSend(Channel *channel, const void *elemAddr);
 
 /**
  * 		Method: ChannelGet();
@@ -61,10 +62,9 @@ void ChannelSend(Channel *channel, void *elemAddr);
  * 	Reads an item from the channel.
  * 
  * If there are no items available, the thread will get blocked until an item
- * is sent into the channel. The returned address will be in the heap, so it is
- * the client's responsibility to free up the memory after use.
+ * is sent into the channel.
  */
-void *ChannelGet(Channel *channel);
+void ChannelGet(Channel *channel, void *buffer);
 
 /**
  * 		Method: ChannelLength();
