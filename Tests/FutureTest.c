@@ -7,7 +7,7 @@
 #include "../Headers/Channel.h"
 #include "../Headers/Future.h"
 
-#define MAX_SLEEP 5
+#define MAX_SLEEP 3
 
 int generatedNumber = 0;
 sem_t numberAvailable;
