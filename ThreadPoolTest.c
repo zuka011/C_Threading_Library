@@ -10,6 +10,11 @@
 #define GROUP_SIZE ((N_ITEMS - 1)/N_WORKERS + 1)
 #define POOL_SIZE 5
 
+unsigned long precalculatedSum = 0;
+double precalculatedAverage = 0;
+
+int verboseOutput = 0;
+
 typedef struct {
 
 	int items[N_ITEMS];
@@ -26,7 +31,6 @@ typedef struct {
 
 void fillData(Data *data) {
 
-	unsigned long precalculatedSum = 0;
 	data->sum = 0;
 
 	for(int i = 0; i < N_ITEMS; i++) {
@@ -37,7 +41,8 @@ void fillData(Data *data) {
 		data->items[i] = currItem;
 	}
 
-	printf("Actual sum of items is: %lu\n", precalculatedSum);
+	if(verboseOutput) printf("Actual sum of items is: %lu\n", precalculatedSum);
+	precalculatedAverage = precalculatedSum/(double) N_ITEMS;
 }
 
 void getSum(void *dataPtr) {
@@ -51,7 +56,7 @@ void getSum(void *dataPtr) {
 	int startIndex = currGroup * GROUP_SIZE;
 	int endIndex = min((currGroup + 1) * GROUP_SIZE, N_ITEMS);
 
-	printf("Worker N%d summing from %d to %d.\n", currGroup + 1, startIndex, endIndex);
+	if(verboseOutput) printf("Worker N%d summing from %d to %d.\n", currGroup + 1, startIndex, endIndex);
 
 	unsigned long sum = 0;
 
@@ -61,7 +66,7 @@ void getSum(void *dataPtr) {
 	data->sum += sum;
 	pthread_mutex_unlock(&data->sumLock);
 
-	printf("Worker N%d done. sum: %lu\n", currGroup + 1, sum);
+	if(verboseOutput) printf("Worker N%d done. sum: %lu\n", currGroup + 1, sum);
 }
 
 void getAverage(void *dataPtr) {
@@ -69,15 +74,36 @@ void getAverage(void *dataPtr) {
 	Data *data = (Data *) dataPtr;
 
 	data->average = data->sum/(double) N_ITEMS;
-	printf("Average calculated.\n");
+	if(verboseOutput) printf("Average calculated.\n");
 }
 
 void displayAverage(void *averagePtr) {
 
-	printf("Average of %d items is: %f.\n", N_ITEMS, *(double *) averagePtr);
+	if(verboseOutput) printf("Average of %d items is: %f.\n", N_ITEMS, *(double *) averagePtr);
 }
 
-int main() {
+int checkCommandLineArgs(int nArgs, char *args[]) {
+
+	if(nArgs > 2) {
+
+		printf("Too many command line arguments. You can request verbose output by adding -v.\n");
+		return 1;
+	}
+
+	if(nArgs == 2) {
+
+		if(strcmp(args[1], "-v") == 0) verboseOutput = 1;
+		else {
+			printf("Not a valid argument. You can request verbose output by adding -v.\n");
+			return 1;
+		} 
+	}
+	return 0;
+}
+ 
+int main(int nArgs, char *args[]) {
+
+	if(checkCommandLineArgs(nArgs, args)) return 1;
 
 	srand(time(NULL));
 
@@ -91,9 +117,9 @@ int main() {
 	pthread_mutex_init(&data.sumLock, NULL);
 	pthread_mutex_init(&data.groupLock, NULL);
 
-	printf("Scheduling threads...\n");
+	if(verboseOutput) printf("Scheduling threads...\n");
 	for(int i = 0; i < N_WORKERS; i++) ThreadPoolSchedule(&pool, getSum, &data);
-	printf("Done.\n");
+	if(verboseOutput) printf("Done.\n");
 
 	ThreadPoolWait(&pool);
 
@@ -105,9 +131,15 @@ int main() {
 
 	ThreadPoolShutdown(&pool);
 
-	printf("Calculated sum by the workers is: %lu\n", data.sum);
+	if(verboseOutput) printf("Calculated sum by the workers is: %lu\n", data.sum);
 	pthread_mutex_destroy(&data.sumLock);
 	pthread_mutex_destroy(&data.groupLock);
+
+	if(precalculatedSum == data.sum) printf("Success. The sum was correctly calculated.\n");
+	else printf("Failure. The sum was incorrectly calculated. Should be: %lu but instead was %lu.\n", precalculatedSum, data.sum);
+
+	if(precalculatedAverage == data.average) printf("Success. The average was correctly calculated.\n");
+	else printf("Failure. The average was incorrectly calculated. Should be: %f but instead was %f.\n", precalculatedAverage, data.average);
 
 	return 0;
 }

@@ -12,21 +12,17 @@ static void *ThreadPoolWorker(void *poolAddr) {
 
 	while(1) {
 
-		Task *currTask = (Task *) QueueDequeue(&pool->taskQueue);
-		if(currTask->processFn == NULL) {
-			
-			free(currTask);
-			break;
-		}
+		Task currTask;
+		QueueDequeue(&pool->taskQueue, &currTask);
 
-		currTask->processFn(currTask->processArgs);
+		if(currTask.processFn == NULL) break;
+
+		currTask.processFn(currTask.processArgs);
 
 		pthread_mutex_lock(&pool->taskLock);
 		pool->tasksLeft--;
 		if(pool->tasksLeft == 0) pthread_cond_broadcast(&pool->taskCond);
 		pthread_mutex_unlock(&pool->taskLock);
-
-		free(currTask);
 	}
 
 	return NULL;
