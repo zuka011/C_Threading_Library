@@ -17,6 +17,8 @@ CHANNEL_DEPS = $(THREAD_POOL_DEPS) $(SOURCE_DIR)/Channel.c $(HEADER_DIR)/Channel
 FUTURE_SRC = $(CHANNEL_SRC) $(SOURCE_DIR)/Future.c
 FUTURE_DEPS = $(CHANNEL_DEPS) $(SOURCE_DIR)/Future.c $(HEADER_DIR)/Future.h
 
+ALL_DEPS = ./Headers/*.h ./Source/*.c ./Tests/*.c
+
 QueueTest: $(QUEUE_DEPS) $(TESTS_DIR)/QueueTest.c
 	$(CC) -o $@ $(QUEUE_SRC) $(TESTS_DIR)/$@.c $(CFLAGS)
 
@@ -29,8 +31,17 @@ ChannelTest: $(CHANNEL_DEPS) $(TESTS_DIR)/ChannelTest.c
 FutureTest: $(FUTURE_DEPS) $(TESTS_DIR)/FutureTest.c
 	$(CC) -o $@ $(FUTURE_SRC) $(TESTS_DIR)/$@.c $(CFLAGS)
 
-All: QueueTest ThreadPoolTest ChannelTest FutureTest
+All: $(ALL_DEPS) QueueTest ThreadPoolTest ChannelTest FutureTest
 
-clean:
-	rm *Test
-	rm *.txt
+ifneq ("$(wildcard ./*.txt)","")
+CLEAN_TXT = rm *.txt 
+endif 	
+
+ifneq ("$(wildcard ./*Test)","")
+CLEAN_TEST = rm *Test 
+endif 
+
+clean: 
+
+	$(CLEAN_TXT)
+	$(CLEAN_TEST)

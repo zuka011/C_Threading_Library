@@ -64,4 +64,6 @@ then
     rm temp.txt
 fi
 
+rm *Test
+
 echo "Memory check done. Passed:" $PASSED"/"$TOTAL_TESTS
