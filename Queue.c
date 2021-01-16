@@ -9,7 +9,7 @@ static void QueueWait(Queue *queue) {
 	} else assert(!QueueIsEmpty(queue));
 }
 
-static void QueueNodeInit(QueueNode *queueNode, void *elemAddr, int elemSize) {
+static void QueueNodeInit(QueueNode *queueNode, const void *elemAddr, int elemSize) {
 
 	queueNode->next = NULL;
 	queueNode->valueAddr = malloc(elemSize);
@@ -39,7 +39,7 @@ void QueueInit(Queue *queue, int elemSize, FreeFn freeFn, int threadSafe) {
 
 //----------------------------------------------------------//
 
-void QueueEnqueue(Queue *queue, void *elemAddr) {
+void QueueEnqueue(Queue *queue, const void *elemAddr) {
 
 	assert(queue != NULL);
 	assert(elemAddr != NULL);

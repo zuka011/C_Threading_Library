@@ -56,7 +56,7 @@ void QueueInit(Queue *queue, int elemSize, FreeFn freeFn, int threadSafe);
  * Enqueues the element at address [elemAddr] to the queue. The element is copied to a new
  * location in the heap.
  */
-void QueueEnqueue(Queue *queue, void *elemAddr);
+void QueueEnqueue(Queue *queue, const void *elemAddr);
 
 /**
  * 		Method: QueueDequeue();
